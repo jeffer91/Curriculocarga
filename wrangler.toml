@@ -1,0 +1,8 @@
+name = "curriculocarga"
+compatibility_date = "2026-08-27"
+pages_build_output_dir = "public"
+
+[vars]
+CURRICULO_PROJECT_ID = "curriculo-ddfcd"
+CURRICULO_STORAGE_BUCKET = "curriculo-ddfcd.firebasestorage.app"
+REPASO_DATABASE_URL = "https://repaso-fire-d8ceb-default-rtdb.firebaseio.com"
