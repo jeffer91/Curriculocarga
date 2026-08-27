@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#0f172a" />
+  <title>Curriculocarga | Fichas CCC</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div id="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">C</div>
+        <div>
+          <strong>Curriculocarga</strong>
+          <span>Construcción de fichas CCC</span>
+        </div>
+      </div>
+      <div id="saveState" class="save-state">Sin cambios pendientes</div>
+    </header>
+
+    <main class="shell">
+      <section id="loginView" class="view login-view">
+        <div class="login-card">
+          <div class="eyebrow">Acceso de coordinadores</div>
+          <h1>Continúa tu ficha curricular</h1>
+          <p>Ingresa tu cédula. El sistema consulta Repaso-Fire únicamente para verificar tu rol y las carreras que tienes asignadas.</p>
+          <form id="loginForm" class="stack">
+            <label class="field">
+              <span>Cédula</span>
+              <input id="cedulaInput" autocomplete="off" inputmode="numeric" maxlength="10" placeholder="Ej. 0201878634" required />
+            </label>
+            <button class="btn primary" type="submit">Ingresar</button>
+          </form>
+          <div id="loginError" class="alert error" hidden></div>
+        </div>
+      </section>
+
+      <section id="selectorView" class="view" hidden>
+        <div class="hero-row">
+          <div>
+            <div class="eyebrow">Coordinador</div>
+            <h1 id="coordinatorName">—</h1>
+            <p id="coordinatorMeta">Selecciona una carrera, nivel y período.</p>
+          </div>
+          <button id="logoutBtn" class="btn ghost" type="button">Cambiar coordinador</button>
+        </div>
+
+        <div class="selector-grid">
+          <label class="field"><span>Carrera asignada</span><select id="careerSelect"><option value="">Seleccionar</option></select></label>
+          <label class="field"><span>Nivel</span><select id="levelSelect" disabled><option value="">Seleccionar</option></select></label>
+          <label class="field"><span>Período de la ficha</span><input id="periodInput" placeholder="Ej. Mayo - Noviembre 2026" /></label>
+        </div>
+        <div id="catalogWarnings" class="alert warn" hidden></div>
+        <div class="actions right"><button id="openFichaBtn" class="btn primary" type="button" disabled>Abrir ficha</button></div>
+      </section>
+
+      <section id="workspaceView" class="view" hidden>
+        <div class="workspace-head">
+          <div>
+            <button id="backBtn" class="link-btn" type="button">← Cambiar selección</button>
+            <h1 id="workspaceTitle">Ficha</h1>
+            <p id="workspaceSubtitle"></p>
+          </div>
+          <div class="progress-box">
+            <div class="progress-top"><strong id="progressText">0%</strong><span id="progressLabel">En proceso</span></div>
+            <div class="progress-track"><div id="progressBar" class="progress-bar"></div></div>
+          </div>
+        </div>
+
+        <nav class="tabs" id="tabs">
+          <button class="tab active" data-tab="general" type="button">1. Datos generales</button>
+          <button class="tab" data-tab="inputs" type="button">2. Inputs</button>
+          <button class="tab" data-tab="materias" type="button">3. Materias</button>
+          <button class="tab" data-tab="revision" type="button">4. Revisión y PDF</button>
+        </nav>
+
+        <section class="panel active" data-panel="general">
+          <div class="panel-head"><div><h2>Datos generales</h2><p>Información de identificación y objetivo de la ficha.</p></div></div>
+          <div class="form-grid two">
+            <label class="field"><span>Código documental *</span><input data-bind="contexto.codigoDocumento" /></label>
+            <label class="field"><span>Coordinador *</span><input data-bind="contexto.coordinador" /></label>
+            <label class="field span-2"><span>Docentes que intervienen en el análisis *</span><textarea rows="4" data-bind="contexto.docentes"></textarea></label>
+            <label class="field"><span>Fecha de inicio *</span><input type="date" data-bind="contexto.fechaInicio" /></label>
+            <label class="field"><span>Fecha de finalización *</span><input type="date" data-bind="contexto.fechaFin" /></label>
+            <label class="field"><span>Elaborado por *</span><input data-bind="contexto.elaboradoPor" /></label>
+            <label class="field"><span>Cargo del elaborador</span><input data-bind="contexto.cargoElaborador" /></label>
+            <label class="field"><span>Revisado por *</span><input data-bind="contexto.revisadoPor" /></label>
+            <label class="field"><span>Aprobado por *</span><input data-bind="contexto.aprobadoPor" /></label>
+            <label class="field span-2"><span>Objetivo de la ficha *</span><textarea rows="5" data-bind="objetivoFicha" placeholder="Objetivo general del análisis por nivel"></textarea></label>
+          </div>
+          <div class="actions"><button class="btn secondary save-now" type="button">Guardar ahora</button></div>
+        </section>
+
+        <section class="panel" data-panel="inputs">
+          <div class="panel-head"><div><h2>Análisis de INPUTS</h2><p>Completa los cuatro insumos institucionales. Puedes marcar “No aplica” con justificación.</p></div></div>
+          <div id="inputsContainer" class="stack-lg"></div>
+          <div class="actions"><button class="btn secondary save-now" type="button">Guardar ahora</button></div>
+        </section>
+
+        <section class="panel" data-panel="materias">
+          <div class="panel-head"><div><h2>Materias del nivel</h2><p>La malla queda congelada al crear la ficha. El CCC puede revisarse y corregirse desde cada materia.</p></div></div>
+          <div class="split-layout">
+            <aside id="subjectList" class="subject-list"></aside>
+            <div id="subjectEditor" class="subject-editor empty-state">Selecciona una materia.</div>
+          </div>
+        </section>
+
+        <section class="panel" data-panel="revision">
+          <div class="panel-head"><div><h2>Revisión final</h2><p>El PDF solo se habilita cuando todos los elementos obligatorios estén completos.</p></div></div>
+          <div id="missingList" class="missing-list"></div>
+          <div class="form-grid two top-gap">
+            <label class="field span-2"><span>Conclusiones * (una por línea)</span><textarea rows="6" data-bind="conclusiones"></textarea></label>
+            <label class="field span-2"><span>Recomendaciones * (una por línea)</span><textarea rows="6" data-bind="recomendaciones"></textarea></label>
+          </div>
+          <div class="actions between">
+            <button class="btn secondary save-now" type="button">Guardar ahora</button>
+            <button id="generatePdfBtn" class="btn primary" type="button" disabled>Generar PDF definitivo</button>
+          </div>
+          <div id="pdfHistory" class="history"></div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <div id="toast" class="toast" hidden></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
+  <script src="./exporters.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
